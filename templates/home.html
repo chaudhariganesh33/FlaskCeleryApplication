@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block start %}
+
+<div class="col-6 mx-auto card p-3 shadow-lg mb-3">
+    <div>
+        <h1>Tasks</h1>
+    </div>
+    <div>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Task ID</th>
+                    <th scope="col">Task Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for task in context.tasks %}
+                <tr>
+                    <td>{{ loop.counter }}</td>
+                    <td>{{ task.id }}</td>
+                    <td>{{ task.status }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div>
+        <a href="/clear_tasks" class="btn btn-primary">Clear Completed Tasks</a>
+        <a href="/add" class="btn btn-primary">Add Task</a>
+    </div>
+</div>
+
+{% endblock %}
