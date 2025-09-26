@@ -13,22 +13,29 @@
                     <th scope="col">#</th>
                     <th scope="col">Task ID</th>
                     <th scope="col">Task Status</th>
+                    <th scope="col">Task Created</th>
                 </tr>
             </thead>
             <tbody>
                 {% for task in context.tasks %}
                 <tr>
-                    <td>{{ loop.counter }}</td>
+                    <th>{{ loop.index }}</th>
                     <td>{{ task.id }}</td>
                     <td>{{ task.status }}</td>
+                    <td>{{ task.date_of_creation }}</td>
+                    <td>
+                        <a href="/delete_task/{{task.id}}" class="btn btn-danger">Delete</a>
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
     <div>
-        <a href="/clear_tasks" class="btn btn-primary">Clear Completed Tasks</a>
+        <a href="/clear_tasks" class="btn btn-primary">Clear Tasks</a>
         <a href="/add" class="btn btn-primary">Add Task</a>
+        <a href="/update" class="btn btn-primary">Update</a>
+
     </div>
 </div>
 
