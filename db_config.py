@@ -14,84 +14,51 @@ def get_connection():
     except:
         return None
     
+def execute_query(query, params=None, fetch=False, many=False):
+    try:
+        with get_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute(query, params)
+                if fetch:
+                    return cur.fetchall()
+                conn.commit()
+                return True
+    except Exception as e:
+        print(f"DB Error: {e}")
+        return None
+    
 
 def create_table():
-    try:
-        conn = get_connection()
-        cur = conn.cursor()
-        cur.execute('DROP TABLE IF EXISTS tasks;')
-        cur.execute('CREATE TABLE tasks (id serial PRIMARY KEY,'
-                                        'task_id VARCHAR (150) NOT NULL,'
-                                        'task_status VARCHAR (100),'
-                                        'date_added date DEFAULT CURRENT_TIMESTAMP);'
-                                        )
-        conn.commit()
-        cur.close()
-        conn.close()
-        return True
-    except:
-        return False
-    
+    query = """
+        CREATE TABLE IF NOT EXISTS tasks (
+            id SERIAL PRIMARY KEY,
+            task_id VARCHAR(150) NOT NULL,
+            task_status VARCHAR(100),
+            date_added date DEFAULT CURRENT_TIMESTAMP
+        );
+    """
+    return execute_query("DROP TABLE IF EXISTS tasks;") and execute_query(query)
 
 def add_task_to_db(task_id, task_status):
-    try:
-        conn = get_connection()
-        cur = conn.cursor()
-        cur.execute('INSERT INTO tasks (task_id, task_status)'
-                    'VALUES (%s, %s)',
-                    (task_id, task_status))
-        conn.commit()
-        cur.close()
-        conn.close()
-        return True
-    except:
-        return 
-    
+    query = "INSERT INTO tasks (task_id, task_status) VALUES (%s, %s);"
+    return execute_query(query, (task_id, task_status))
+ 
     
 def update_task(task_id, task_status):
-    conn = get_connection()
-    cur = conn.cursor()
-    cur.execute(f"UPDATE tasks SET task_status = '{task_status}' WHERE task_id = '{task_id}'")
-    conn.commit()
-    cur.close()
-    conn.close()
+    query = "UPDATE tasks SET task_status = %s WHERE task_id = %s;"
+    return execute_query(query, (task_status, task_id))
 
 
 def remove_task(task_id):
-    try:
-        conn = get_connection()
-        cur = conn.cursor()
-        query = f"DELETE FROM tasks WHERE task_id = '{task_id}';"
-        cur.execute(query)
-        conn.commit()
-        cur.close()
-        conn.close()
-        return True
-    except:
-        return None
+    query = "DELETE FROM tasks WHERE task_id = %s;"
+    return execute_query(query, (task_id,))
 
 
 def get_completed_tasks():
-    try:
-        conn = get_connection()
-        cur = conn.cursor()
-        cur.execute("SELECT * FROM tasks WHERE task_status = 'SUCCESS';")
-        completed_tasks = cur.fetchall()
-        cur.close()
-        conn.close()
-        return completed_tasks
-    except:
-        return None
+    query = "SELECT * FROM tasks WHERE task_status = 'SUCCESS';"
+    return execute_query(query, fetch=True)
 
 
 def get_all_tasks():
-    try:
-        conn = get_connection()
-        cur = conn.cursor()
-        cur.execute("SELECT * FROM tasks;")
-        tasks = cur.fetchall()
-        cur.close()
-        conn.close()
-        return tasks
-    except:
-        return None
+    query = "SELECT * FROM tasks;"
+    return execute_query(query, fetch=True)
